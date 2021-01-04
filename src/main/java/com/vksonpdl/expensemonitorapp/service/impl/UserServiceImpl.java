@@ -34,6 +34,8 @@ public class UserServiceImpl implements UserService {
 			user.setUserProfileEntity(userProfile);
 			userRepo.save(user);
 			isRegistered = Boolean.TRUE;
+			
+			log.info("Telegram Id: {} is Registered Successfully !", telId);
 
 		} catch (Exception e) {
 			log.error("Exception from registerTelegramUserfor Telegram Id :{}, Exception: {}", telId, e.getMessage());

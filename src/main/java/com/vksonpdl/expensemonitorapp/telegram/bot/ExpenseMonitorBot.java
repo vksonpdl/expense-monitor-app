@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -30,8 +31,9 @@ public class ExpenseMonitorBot extends TelegramLongPollingBot {
 
 	@Autowired
 	UserService userService;
-	
-	@Autowired BotMessageHelper botMessageHelper;
+
+	@Autowired
+	BotMessageHelper botMessageHelper;
 
 	@Override
 	public void onUpdateReceived(Update update) {
@@ -41,6 +43,7 @@ public class ExpenseMonitorBot extends TelegramLongPollingBot {
 				String messageText = update.getMessage().getText();
 				String telId = update.getMessage().getFrom().getUserName();
 				UserStatusEnum userStatusEnum = userService.isTelegramUserRegistered(telId);
+				Message replayMessage = update.getMessage().getReplyToMessage();
 
 				SendMessage message = new SendMessage();
 				message.setParseMode(ParseMode.HTML);
@@ -48,12 +51,12 @@ public class ExpenseMonitorBot extends TelegramLongPollingBot {
 
 				switch (userStatusEnum) {
 				case NOT_FOUND:
-					if(messageText.equals(BotMessageHelper.MSG_REGISTER) && userService.registerTelegramUser(telId)) {
+					if (messageText.equals(BotMessageHelper.MSG_REGISTER) && userService.registerTelegramUser(telId)) {
 						message.setText(botMessageHelper.getUserResgisteredMessage(telId));
-					}else {
+					} else {
 						message.setText(botMessageHelper.getUserNotResgisteredMessage(telId));
 					}
-					
+
 					break;
 
 				case LOCKED:
@@ -61,11 +64,26 @@ public class ExpenseMonitorBot extends TelegramLongPollingBot {
 					break;
 
 				default:
-					message.setText("Telegram Id: ".concat(telId).concat(" is Found"));
+					if(null!=replayMessage) {
+						//TODO: Verify Replay Message
+					}
+					switch (messageText) {
+					case BotMessageHelper.MSG_GENERATE_TEL_CODE:
+						message.setText(botMessageHelper.getTBDMessage(telId));
+						break;
+					case BotMessageHelper.MSG_ADD_EXPENSE:
+						message.setText(botMessageHelper.getTBDMessage(telId));
+						break;
+					default:
+						message.setText(botMessageHelper.getStartMessage(telId));
+						break;
+					}
+					
 					break;
 				}
 
 				try {
+					
 					execute(message);
 				} catch (TelegramApiException e) {
 					log.error("TelegramApiException From onUpdateReceived() : {}", e.getMessage());
