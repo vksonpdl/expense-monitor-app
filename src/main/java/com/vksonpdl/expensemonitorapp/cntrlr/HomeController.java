@@ -21,15 +21,12 @@ public class HomeController {
 	@Autowired
 	UserRepo userRepo;
 	
-	@Value("${telegram.bot.username}")
-	String botUserName;
-	
 	@GetMapping() 
 	public ResponseEntity<ResponsePayload> getHome() {
 		
 		ResponsePayload responsePayload =new ResponsePayload();
 		responsePayload.setStatus("SUCCESS");
-		responsePayload.setMessage("UI TBD + :"+botUserName);
+		responsePayload.setMessage("UI TBD");
 		responsePayload.setResponseDate(new Date());
 		
 		Map<String, Long> tableSize = new HashMap<>();
