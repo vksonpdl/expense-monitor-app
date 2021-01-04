@@ -14,3 +14,6 @@ spring:
     username: ${JDBC_DATABASE_USERNAME}
     password: ${JDBC_DATABASE_PASSWORD}
     
+telegram:
+  bot:
+    username: ${TELEGRAM_BOT_UN}
