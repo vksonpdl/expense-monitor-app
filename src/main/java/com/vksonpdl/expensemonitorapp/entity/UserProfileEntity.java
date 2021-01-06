@@ -48,7 +48,7 @@ public class UserProfileEntity implements Serializable{
 	private LocalDateTime eMailCodeTimestamp;
 	
 	@Column(name = "tel_code")
-	private String telCode;
+	private int telCode;
 	
 	@Column(name = "tel_code_timestamp")
 	private LocalDateTime telCodeTimestamp;

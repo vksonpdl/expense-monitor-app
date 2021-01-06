@@ -12,7 +12,10 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.vksonpdl.expensemonitorapp.enumeration.UserStatusEnum;
 import com.vksonpdl.expensemonitorapp.service.UserService;
-import com.vksonpdl.expensemonitorapp.telegram.helper.BotMessageHelper;
+import com.vksonpdl.expensemonitorapp.telegram.constants.TelegramActions;
+import com.vksonpdl.expensemonitorapp.telegram.helper.BotReplayHelper;
+import com.vksonpdl.expensemonitorapp.telegram.helper.msg.BotMessageHelper;
+import com.vksonpdl.expensemonitorapp.telegram.helper.msg.BotTelCodeMessageHelper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,6 +37,12 @@ public class ExpenseMonitorBot extends TelegramLongPollingBot {
 
 	@Autowired
 	BotMessageHelper botMessageHelper;
+	
+	@Autowired
+	BotTelCodeMessageHelper botTelCodeMessageHelper;
+	
+	@Autowired
+	BotReplayHelper botReplayHelper; 
 
 	@Override
 	public void onUpdateReceived(Update update) {
@@ -51,7 +60,7 @@ public class ExpenseMonitorBot extends TelegramLongPollingBot {
 
 				switch (userStatusEnum) {
 				case NOT_FOUND:
-					if (messageText.equals(BotMessageHelper.MSG_REGISTER) && userService.registerTelegramUser(telId)) {
+					if (messageText.equals(TelegramActions.MSG_REGISTER) && userService.registerTelegramUser(telId)) {
 						message.setText(botMessageHelper.getUserResgisteredMessage(telId));
 					} else {
 						message.setText(botMessageHelper.getUserNotResgisteredMessage(telId));
@@ -64,20 +73,26 @@ public class ExpenseMonitorBot extends TelegramLongPollingBot {
 					break;
 
 				default:
-					if(null!=replayMessage) {
-						//TODO: Verify Replay Message
+					if(null!=replayMessage && replayMessage.getFrom().getUserName().equals(botUserName)) {
+						message.setText(botReplayHelper.getMessageBasedOnReplay(update.getMessage(),telId));
+					}else {
+						switch (messageText) {
+						case TelegramActions.MSG_GENERATE_TEL_CODE:
+							int telCode = userService.generateTelegramCode(telId);
+							message.setText(botTelCodeMessageHelper.getTelegramCodeMessage(telId,telCode));
+							break;
+						case TelegramActions.MSG_VALIDATE_TEL_CODE:
+							message.setText(TelegramActions.REPLAY_VALIDATE_TEL_CODE);
+							break;
+						case TelegramActions.MSG_ADD_EXPENSE:
+							message.setText(botMessageHelper.getTBDMessage(telId));
+							break;
+						default:
+							message.setText(botMessageHelper.getStartMessage(telId));
+							break;
+						}
 					}
-					switch (messageText) {
-					case BotMessageHelper.MSG_GENERATE_TEL_CODE:
-						message.setText(botMessageHelper.getTBDMessage(telId));
-						break;
-					case BotMessageHelper.MSG_ADD_EXPENSE:
-						message.setText(botMessageHelper.getTBDMessage(telId));
-						break;
-					default:
-						message.setText(botMessageHelper.getStartMessage(telId));
-						break;
-					}
+					
 					
 					break;
 				}

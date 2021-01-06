@@ -1,24 +1,22 @@
-package com.vksonpdl.expensemonitorapp.telegram.helper;
+package com.vksonpdl.expensemonitorapp.telegram.helper.msg;
 
 import org.springframework.stereotype.Component;
+
+import com.vksonpdl.expensemonitorapp.telegram.constants.TelegramActions;
 
 @Component
 public class BotMessageHelper {
 
-	public static final String MSG_REGISTER = "/register";
-	public static final String MSG_START = "/start";
-	public static final String MSG_GENERATE_TEL_CODE = "/generateCode";
-	public static final String MSG_ADD_EXPENSE = "/addExpense";
+	
 	
 	private static final String NEW_LINE = " \n";
-
 	StringBuilder messageBuilder;
 
 	public String getUserNotResgisteredMessage(String telId) {
 
 		messageBuilder = new StringBuilder();
 		messageBuilder.append("Telegram Id: ").append(getBoldString(telId)).append(" Is not Registered !")
-			.append(NEW_LINE).append("Do you want to ").append(getItalicsString(MSG_REGISTER));
+			.append(NEW_LINE).append("Do you want to ").append(getItalicsString(TelegramActions.MSG_REGISTER));
 
 		return messageBuilder.toString();
 	}
@@ -33,26 +31,25 @@ public class BotMessageHelper {
 
 	public String getUserResgisteredMessage(String telId) {
 		messageBuilder = new StringBuilder();
-		messageBuilder.append("Telegram Id: ").append(getBoldString(telId)).append(" Is Registered SuccessFull ")
-				.append(getItalicsString(MSG_START)).append(" using the bot");
-
+		messageBuilder.append("Telegram Id: ").append(getBoldString(telId)).append(" Is Registered SuccessFully ").append(NEW_LINE)
+				.append(getItalicsString(TelegramActions.MSG_START)).append(" using the bot");
 		return messageBuilder.toString();
 	}
 	
 	public String getStartMessage(String telId) {
 		messageBuilder = new StringBuilder();
-		messageBuilder.append("Hi: ").append(getBoldString(telId)).append(NEW_LINE)
-				.append(getItalicsString(MSG_GENERATE_TEL_CODE)).append(" : To Create new telegram code \n")
-		.append(getItalicsString(MSG_ADD_EXPENSE)).append(" : To Add new Expense");
-
+		messageBuilder.append("Hi ").append(getBoldString(telId)).append(NEW_LINE).append(NEW_LINE)
+				.append(getItalicsString(TelegramActions.MSG_GENERATE_TEL_CODE)).append(" : To Create new telegram code \n")
+				.append(getItalicsString(TelegramActions.MSG_VALIDATE_TEL_CODE)).append(" : To Validate telegram code \n")
+				.append(getItalicsString(TelegramActions.MSG_ADD_EXPENSE)).append(" : To Add new Expense");
 		return messageBuilder.toString();
 	}
 	
+	
 	public String getTBDMessage(String telId) {
 		messageBuilder = new StringBuilder();
-		messageBuilder.append("Hi: ").append(getBoldString(telId)).append(NEW_LINE)
+		messageBuilder.append("Hi ").append(getBoldString(telId)).append(NEW_LINE)
 				.append(getItalicsString("TBD"));
-
 		return messageBuilder.toString();
 	}
 	
